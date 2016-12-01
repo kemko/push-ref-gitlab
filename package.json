@@ -1,0 +1,31 @@
+{
+  "name": "push-ref-gitlab",
+  "version": "0.0.0",
+  "description": "A command line tool used for pushing a Git ref to Gitlab and setting up Continuous Integration in the process.",
+  "main": "index.js",
+  "engines": {
+    "node": ">=6.0.0"
+  },
+  "bin": "./index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/avtar/sync-gitlab-mirror.git"
+  },
+  "keywords": [
+    "npm",
+    "github",
+    "gitlab",
+    "node",
+    "module",
+    "CLI"
+  ],
+  "author": "GPII",
+  "license": "BSD-3-Clause",
+  "bugs": {
+    "url": "https://issues.gpii.net"
+  },
+  "homepage": "http://gpii.net",
+  "dependencies": {
+    "minimist": "1.2.0"
+  }
+}
