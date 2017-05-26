@@ -19,6 +19,7 @@ Clone this repository and use npm to install:
 --gitlab-repo-owner=gitlab-account-name \
 --gitlab-repo-name=gitlab-target-repo \
 --ref=git-ref-to-push \
+--gitlab-enable-shared-runners=true \
 --gitlab-token=gitlab-token \
 --gitlab-runner-id=gitlab-ci-runner-id \
 --cwd=working-directory

@@ -8,7 +8,9 @@ var https = require('https'),
     fs = require("fs"),
     spawn = require("child_process").spawn,
     argv = require('minimist')(process.argv.slice(2), {
+        boolean: ["gitlab-enable-shared-runners"],
         default: {
+            "gitlab-enable-shared-runners": false,
             "gitlab-instance": "https://gitlab.com",
             cwd: process.cwd()
         }
@@ -31,6 +33,7 @@ var GITHUB_REPO = argv['github-repo-name'];
 
 var GITLAB_TOKEN = argv['gitlab-token'];
 
+var GITLAB_ENABLE_SHARED_RUNNERS = argv['gitlab-enable-shared-runners'];
 var GITLAB_RUNNER_ID = argv['gitlab-runner-id'];
 var CWD = argv['cwd'];
 
@@ -114,7 +117,7 @@ function createGitlabProject (repo, account) {
     return makeGitlabRequest('/projects', {
         name: repo,
         public: "true",
-        shared_runners_enabled: "false",
+        shared_runners_enabled: GITLAB_ENABLE_SHARED_RUNNERS,
         issues_enabled: "false"
     });
 }
@@ -192,7 +195,7 @@ function getGitlabRemote (name, owner) {
         }).then(function (url) {
             res(url);
         }).catch(function (e) {
-            res('');
+            res("");
         });
     });
 }
