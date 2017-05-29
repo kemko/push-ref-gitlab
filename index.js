@@ -30,8 +30,8 @@ var GITLAB_ENABLE_SHARED_RUNNERS = argv['gitlab-enable-shared-runners'];
 
 var GITHUB_REF = argv['ref'].split("/").slice(-1)[0];
 var GITHUB_USER = argv['github-repo-owner'];
-var GITHUB_REPO = argv['github-repo-name'];
-var REPO_NAME = GITHUB_REPO.split("/").slice(-1)[0];
+var GITHUB_REPO_PATH = argv['github-repo-path'];
+var REPO_NAME = GITHUB_REPO_PATH.split("/").slice(-1)[0];
 var GITHUB_TOKEN = argv['github-private-token'];
 
 
@@ -169,7 +169,7 @@ function git (command, args, opts) {
 }
 
 function cloneRepo (outputDir) {
-    return git("clone", ["https://" + GITHUB_USER + ":" + GITHUB_TOKEN + "@github.com/" + GITHUB_REPO, outputDir]);
+    return git("clone", ["https://" + GITHUB_USER + ":" + GITHUB_TOKEN + "@github.com/" + GITHUB_REPO_PATH, outputDir]);
 }
 
 function addRemote (repo_name) {
@@ -242,7 +242,7 @@ ensureGitlabProjectExists(REPO_NAME, GITLAB_USER).then(function (data) {
     return addGitlabBuildEventsHook(GITLAB_USER_AND_REPO, BUILD_EVENTS_WEBHOOK_URL);
 }).then(function (data) {
     console.log("The build events hook was created.");
-    console.log("Cloning the repository: " + GITHUB_REPO);
+    console.log("Cloning the repository: " + GITHUB_REPO_PATH);
     return ensureRepoWorkingDirExists(REPO_NAME);
 }).then(function (data) {
     console.log("The repository exists on the disk.");
