@@ -127,7 +127,6 @@ function doesGitlabBuildEventsHookExists (repo, account, webhookUrl) {
 function createGitlabProject (repo, account) {
     return makeGitlabRequest('/projects', {
         name: repo,
-        public: "true",
         shared_runners_enabled: GITLAB_ENABLE_SHARED_RUNNERS,
         issues_enabled: "false"
     });
