@@ -111,6 +111,17 @@ function doesGitlabProjectExist (repo, account) {
     });
 }
 
+function doesGitlabBuildEventsHookExists (repo, account, webhookUrl) {
+    return makeGitlabRequest("projects/" + account + "%2F" + repo + '/hooks').then(function (data) {
+        data = data || {};
+        var hook = {};
+        data.forEach(function(item) {
+            if(item.url == webhookUrl) hook = item;
+        });
+        return hook.hasOwnProperty('url') ? hook : false;
+    });
+}
+
 // Shared runners are being disabled because the ones provided by gitlab.com will not provide
 // IDI supported environments
 function createGitlabProject (repo, account) {
@@ -138,6 +149,19 @@ function ensureGitlabProjectExists (repo, account) {
 function enableGitlabRunner (projectId) {
     return makeGitlabRequest('/projects/' + projectId + '/runners', {
         runner_id: GITLAB_RUNNER_ID
+    });
+}
+
+function ensureGitlabBuildEventsHookExists (projectFullName, webhookUrl) {
+    console.log("Checking if " + REPO_NAME + " hook exists...");
+    return doesGitlabBuildEventsHookExists(REPO_NAME, GITLAB_USER, webhookUrl).then(function (data) {
+        console.log(GITLAB_USER + "/" + REPO_NAME + " hook " + (data.url ? "exists" : "doesn't exist."));
+        if (data.url) {
+            return data;
+        }
+
+        console.log("Creating the hook.");
+        return addGitlabBuildEventsHook(projectFullName, webhookUrl);
     });
 }
 
@@ -174,10 +198,11 @@ function cloneRepo (outputDir) {
 
 function addRemote (repo_name) {
     var dir = getRepoWorkingDirPath(repo_name);
+    var parsed = url.parse(GITLAB_HOST);
     return git("remote", [
         "add",
         "gitlab",
-        "https://" + GITLAB_USER + ":" + GITLAB_TOKEN + "@" + new URL(GITLAB_HOST).hostname + "/" + GITLAB_USER + "/" + REPO_NAME + ".git"
+        "https://" + GITLAB_USER + ":" + GITLAB_TOKEN + "@" + parsed.hostname + "/" + GITLAB_USER + "/" + REPO_NAME + ".git"
     ], {
         cwd: dir
     });
@@ -239,19 +264,18 @@ ensureGitlabProjectExists(REPO_NAME, GITLAB_USER).then(function (data) {
     return enableGitlabRunner(data.id)
 }).then(function (data) { */
     console.log("Adding build events hook URL...");
-    return addGitlabBuildEventsHook(GITLAB_USER_AND_REPO, BUILD_EVENTS_WEBHOOK_URL);
+    return ensureGitlabBuildEventsHookExists(GITLAB_USER_AND_REPO, BUILD_EVENTS_WEBHOOK_URL);
 }).then(function (data) {
-    console.log("The build events hook was created.");
     console.log("Cloning the repository: " + GITHUB_REPO_PATH);
     return ensureRepoWorkingDirExists(REPO_NAME);
 }).then(function (data) {
     console.log("The repository exists on the disk.");
     console.log("Making sure the Gitlab remote exists...");
-    return ensureRepoRemoteExists(REPO_NAME, GITLAB_ACCOUNT);
+    return ensureRepoRemoteExists(REPO_NAME);
 }).then(function (data) {
     console.log("Added the Gitlab remote.");
     console.log("Pushing the ref...");
-    return pushRef(GITHUB_REF);
+    return pushRef(REPO_NAME, GITHUB_REF);
 }).then(function () {
     console.log("Pushed the ref to Gitlab.");
 }).catch(function (e) {
