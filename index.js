@@ -26,13 +26,14 @@ var BUILD_EVENTS_WEBHOOK_URL = argv['build-events-webhook-url'];
 var GITLAB_HOST = argv['gitlab-instance'];
 var GITLAB_USER = argv['gitlab-repo-owner'];
 var GITLAB_REPO = argv['gitlab-repo-name'];
+var GITLAB_TOKEN = argv['gitlab-token'];
+var GITLAB_ENABLE_SHARED_RUNNERS = argv['gitlab-enable-shared-runners'];
 
 var GITHUB_REF = argv['ref'].split("/").slice(-1)[0];
 var GITHUB_USER = argv['github-repo-owner'];
 var GITHUB_REPO = argv['github-repo-name'];
+var GITHUB_TOKEN = argv['github-private-token'];
 
-var GITLAB_TOKEN = argv['gitlab-token'];
-var GITLAB_ENABLE_SHARED_RUNNERS = argv['gitlab-enable-shared-runners'];
 
 var CWD = argv['cwd'];
 
@@ -168,7 +169,7 @@ function git (command, args, opts) {
 }
 
 function cloneRepo (owner, repo, outputDir) {
-    return git("clone", ["https://github.com/" + owner + "/" + repo, outputDir]);
+    return git("clone", ["https://" + GITHUB_USER + ":" + GITHUB_TOKEN + "@github.com/" + owner + "/" + repo, outputDir]);
 }
 
 function addRemote (name, owner) {
