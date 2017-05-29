@@ -10,7 +10,7 @@ var https = require('https'),
     argv = require('minimist')(process.argv.slice(2), {
         boolean: ["gitlab-enable-shared-runners"],
         default: {
-            "gitlab-enable-shared-runners": false,
+            "gitlab-enable-shared-runners": true,
             "gitlab-instance": "https://gitlab.com",
             cwd: process.cwd()
         }
@@ -32,9 +32,8 @@ var GITHUB_USER = argv['github-repo-owner'];
 var GITHUB_REPO = argv['github-repo-name'];
 
 var GITLAB_TOKEN = argv['gitlab-token'];
-
 var GITLAB_ENABLE_SHARED_RUNNERS = argv['gitlab-enable-shared-runners'];
-var GITLAB_RUNNER_ID = argv['gitlab-runner-id'];
+
 var CWD = argv['cwd'];
 
 var GITLAB_USER_AND_REPO = GITLAB_USER + "%2F" + GITLAB_REPO;
@@ -125,7 +124,7 @@ function createGitlabProject (repo, account) {
 function ensureGitlabProjectExists (repo, account) {
     console.log("Checking if " + GITLAB_REPO + " project exists...");
     return doesGitlabProjectExist(GITLAB_REPO, GITLAB_USER).then(function (data) {
-        console.log(GITLAB_REPO + " project " + (data.projectExists ? "exists" : "doesn't exist."));
+        console.log(GITLAB_USER + "/" + GITLAB_REPO + " project " + (data.projectExists ? "exists" : "doesn't exist."));
         if (data.projectExists) {
             return data;
         }
@@ -234,10 +233,10 @@ function ensureRepoRemoteExists (name, owner) {
 
 console.log("Ensuring the project exists...");
 ensureGitlabProjectExists(GITLAB_REPO, GITLAB_USER).then(function (data) {
-    // Add the CI runner's ID
+/*    // Add the CI runner's ID
     console.log("Enabling the CI runner...");
     return enableGitlabRunner(data.id)
-}).then(function (data) {
+}).then(function (data) { */
     console.log("Adding build events hook URL...");
     return addGitlabBuildEventsHook(GITLAB_USER_AND_REPO, BUILD_EVENTS_WEBHOOK_URL);
 }).then(function (data) {
