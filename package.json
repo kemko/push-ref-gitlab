@@ -9,7 +9,7 @@
   "bin": "./index.js",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/avtar/sync-gitlab-mirror.git"
+    "url": "git+https://github.com/kemko/push-ref-gitlab.git"
   },
   "keywords": [
     "npm",

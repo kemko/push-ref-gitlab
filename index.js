@@ -246,7 +246,7 @@ ensureGitlabProjectExists(GITLAB_REPO, GITLAB_USER).then(function (data) {
 }).then(function (data) {
     console.log("The repository exists on the disk.");
     console.log("Making sure the Gitlab remote exists...");
-    return ensureRepoRemoteExists(GITHUB_REPO, GITHUB_USER);
+    return ensureRepoRemoteExists(GITLAB_REPO, GITLAB_ACCOUNT);
 }).then(function (data) {
     console.log("Added the Gitlab remote.");
     console.log("Pushing the ref...");
