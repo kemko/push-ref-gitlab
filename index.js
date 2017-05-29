@@ -32,6 +32,7 @@ var GITLAB_ENABLE_SHARED_RUNNERS = argv['gitlab-enable-shared-runners'];
 var GITHUB_REF = argv['ref'].split("/").slice(-1)[0];
 var GITHUB_USER = argv['github-repo-owner'];
 var GITHUB_REPO = argv['github-repo-name'];
+var GITHUB_REPO_NAME = GITHUB_REPO.split("/").slice(-1)[0];
 var GITHUB_TOKEN = argv['github-private-token'];
 
 
@@ -168,12 +169,12 @@ function git (command, args, opts) {
     });
 }
 
-function cloneRepo (owner, repo, outputDir) {
-    return git("clone", ["https://" + GITHUB_USER + ":" + GITHUB_TOKEN + "@github.com/" + owner + "/" + repo, outputDir]);
+function cloneRepo (outputDir) {
+    return git("clone", ["https://" + GITHUB_USER + ":" + GITHUB_TOKEN + "@github.com/" + GITHUB_REPO, outputDir]);
 }
 
-function addRemote (name, owner) {
-    var dir = getRepoWorkingDirPath(name, owner);
+function addRemote (repo_name) {
+    var dir = getRepoWorkingDirPath(repo_name);
     return git("remote", [
         "add",
         "gitlab",
@@ -183,8 +184,8 @@ function addRemote (name, owner) {
     });
 }
 
-function getGitlabRemote (name, owner) {
-    var dir = getRepoWorkingDirPath(name, owner);
+function getGitlabRemote (repo_name) {
+    var dir = getRepoWorkingDirPath(repo_name);
     return new Promise(function (res, rej) {
         // If there's no remote and that causes a failure here, let's resolve with an empty string
         git("remote", [
@@ -201,8 +202,8 @@ function getGitlabRemote (name, owner) {
 }
 
 // Takes git ref arg and pushes to Gitlab remote of repo arg
-function pushRef (name, owner, ref) {
-    var dir = getRepoWorkingDirPath(name, owner);
+function pushRef (repo_name, ref) {
+    var dir = getRepoWorkingDirPath(repo_name);
     return git("push", [
         "gitlab",
         "origin/" + GITHUB_REF + ":refs/heads/" + GITHUB_REF,
@@ -212,23 +213,23 @@ function pushRef (name, owner, ref) {
     });
 }
 
-function getRepoWorkingDirPath (name, owner) {
-    return CWD + "/" + name + "_" + owner;
+function getRepoWorkingDirPath (repo_name) {
+    return CWD + "/" + repo_name;
 }
 
-function ensureRepoWorkingDirExists (name, owner) {
-    var dir = getRepoWorkingDirPath(name, owner);
+function ensureRepoWorkingDirExists (repo_name) {
+    var dir = getRepoWorkingDirPath(repo_name);
     if (pathExists(dir)) {
         return new Promise(function (res) {
             res(true);
         });
     }
-    return cloneRepo(GITHUB_USER, GITHUB_REPO, dir);
+    return cloneRepo(dir);
 }
 
-function ensureRepoRemoteExists (name, owner) {
-    return getGitlabRemote(name, owner).then(function (url) {
-        return addRemote(name, owner);
+function ensureRepoRemoteExists (repo_name) {
+    return getGitlabRemote(repo_name).then(function (url) {
+        return addRemote(repo_name);
     });
 }
 
@@ -242,8 +243,8 @@ ensureGitlabProjectExists(GITLAB_REPO, GITLAB_USER).then(function (data) {
     return addGitlabBuildEventsHook(GITLAB_USER_AND_REPO, BUILD_EVENTS_WEBHOOK_URL);
 }).then(function (data) {
     console.log("The build events hook was created.");
-    console.log("Cloning the repository: " + GITHUB_USER + "/" + GITHUB_REPO);
-    return ensureRepoWorkingDirExists(GITHUB_REPO, GITHUB_USER);
+    console.log("Cloning the repository: " + GITHUB_REPO);
+    return ensureRepoWorkingDirExists(GITHUB_REPO_NAME);
 }).then(function (data) {
     console.log("The repository exists on the disk.");
     console.log("Making sure the Gitlab remote exists...");
@@ -251,7 +252,7 @@ ensureGitlabProjectExists(GITLAB_REPO, GITLAB_USER).then(function (data) {
 }).then(function (data) {
     console.log("Added the Gitlab remote.");
     console.log("Pushing the ref...");
-    return pushRef(GITHUB_REPO, GITHUB_USER, GITHUB_REF);
+    return pushRef(GITHUB_REF);
 }).then(function () {
     console.log("Pushed the ref to Gitlab.");
 }).catch(function (e) {
