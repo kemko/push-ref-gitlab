@@ -199,7 +199,7 @@ function cloneRepo(outputDir) {
 
 function fetchRepo(outputDir) {
   console.log("Fetching repo...");
-  return git("fetch", ["github"], cwd: outputDir]);
+  return git("fetch", ["github"], {cwd: outputDir});
 }
 
 function addRemote(repoName) {
