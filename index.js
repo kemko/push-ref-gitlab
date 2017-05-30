@@ -199,7 +199,7 @@ function cloneRepo(outputDir) {
 
 function fetchRepo(outputDir) {
   console.log("Fetching repo...");
-  return git("fetch", ["github"], {cwd: outputDir});
+  return git("fetch", ["origin"], {cwd: outputDir});
 }
 
 function addRemote(repoName) {
@@ -223,10 +223,10 @@ function getGitlabRemote(repoName) {
       "gitlab"
     ], {
       cwd: dir
-    }).then(function(url) {
-      res(url);
     }).catch(function(e) {
       res("");
+    }).then(function(url) {
+      res(url);
     });
   });
 }
@@ -275,7 +275,6 @@ ensureGitlabProjectExists(repoName, GITLAB_USER).then(function(data) {
   console.log("Checking repository state...");
   return ensureRepoWorkingDirExistsAndUpdated(repoName);
 }).then(function(data) {
-  console.log("The repository exists on the disk.");
   console.log("Making sure the Gitlab remote exists...");
   return ensureRepoRemoteExists(repoName);
 }).then(function(data) {
