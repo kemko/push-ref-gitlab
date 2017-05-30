@@ -271,7 +271,7 @@ ensureGitlabProjectExists(repoName, GITLAB_USER).then(function(data) {
   return ensureGitlabBuildEventsHookExists(GITLAB_USER_AND_REPO, BUILD_EVENTS_WEBHOOK_URL);
 }).then(function(data) {
   console.log("Cloning the repository: " + GITHUB_REPO_PATH);
-  return ensureRepoWorkingDirExists(repoName);
+  return ensureRepoWorkingDirExistsAndUpdated(repoName);
 }).then(function(data) {
   console.log("The repository exists on the disk.");
   console.log("Making sure the Gitlab remote exists...");
