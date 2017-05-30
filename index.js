@@ -193,7 +193,13 @@ function git(command, args, opts) {
 }
 
 function cloneRepo(outputDir) {
+  console.log("Cloning repo...");
   return git("clone", ["https://" + GITHUB_USER + ":" + GITHUB_TOKEN + "@github.com/" + GITHUB_REPO_PATH, outputDir]);
+}
+
+function fetchRepo(outputDir) {
+  console.log("Fetching repo...");
+  return git("fetch", ["github"], cwd: outputDir]);
 }
 
 function addRemote(repoName) {
@@ -245,11 +251,7 @@ function ensureRepoWorkingDirExistsAndUpdated(repoName) {
   var dir = getRepoWorkingDirPath(repoName);
   if (pathExists(dir)) {
 
-    return git("fetch", [
-      "origin"
-    ], {
-      cwd: dir
-    });
+    return fetchRepo(dir);
   } else {
     return cloneRepo(dir);
   }
@@ -270,7 +272,7 @@ ensureGitlabProjectExists(repoName, GITLAB_USER).then(function(data) {
   console.log("Adding build events hook URL...");
   return ensureGitlabBuildEventsHookExists(GITLAB_USER_AND_REPO, BUILD_EVENTS_WEBHOOK_URL);
 }).then(function(data) {
-  console.log("Cloning the repository: " + GITHUB_REPO_PATH);
+  console.log("Checking repository state...");
   return ensureRepoWorkingDirExistsAndUpdated(repoName);
 }).then(function(data) {
   console.log("The repository exists on the disk.");
