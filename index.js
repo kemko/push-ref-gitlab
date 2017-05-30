@@ -3,7 +3,6 @@
 "use strict";
 
 var https = require('https'),
-  del = require('del'),
   qs = require('querystring'),
   url = require('url'),
   fs = require("fs"),
@@ -194,11 +193,6 @@ function git(command, args, opts) {
 
 function cloneRepo(outputDir) {
   return git("clone", ["https://" + GITHUB_USER + ":" + GITHUB_TOKEN + "@github.com/" + GITHUB_REPO_PATH, outputDir]);
-}
-
-function deleteRepo(repoName) {
-  dir = getRepoWorkingDirPath(repoName);
-  del.sync(dir);
 }
 
 function addRemote(repoName) {
