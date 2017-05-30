@@ -246,15 +246,18 @@ function getRepoWorkingDirPath(repoName) {
   return CWD + "/" + repoName;
 }
 
-function ensureRepoWorkingDirExists(repoName) {
+function ensureRepoWorkingDirExistsAndUpdated(repoName) {
   var dir = getRepoWorkingDirPath(repoName);
   if (pathExists(dir)) {
 
-    return new Promise(function(res) {
-      res(true);
+    return git("fetch", [
+      "origin"
+    ], {
+      cwd: dir
     });
+  } else {
+    return cloneRepo(dir);
   }
-  return cloneRepo(dir);
 }
 
 function ensureRepoRemoteExists(repoName) {
@@ -554,7 +557,7 @@ ensureGitlabProjectExists(repoName, GITLAB_USER).then(function(data) {
   return ensureGitlabBuildEventsHookExists(GITLAB_USER_AND_REPO, BUILD_EVENTS_WEBHOOK_URL);
 }).then(function(data) {
   console.log("Cloning the repository: " + GITHUB_REPO_PATH);
-  return ensureRepoWorkingDirExists(repoName);
+  return ensureRepoWorkingDirExistsAndUpdated(repoName);
 }).then(function(data) {
   console.log("The repository exists on the disk.");
   console.log("Making sure the Gitlab remote exists...");
@@ -563,9 +566,6 @@ ensureGitlabProjectExists(repoName, GITLAB_USER).then(function(data) {
   console.log("Added the Gitlab remote.");
   console.log("Pushing the ref...");
   return pushRef(repoName, GITHUB_REF);
-}).then(function(data) {
-  console.log("Remove project from container.");
-  return deleteRepo(repoName);
 }).then(function() {
   console.log("Pushed the ref to Gitlab.");
 }).catch(function(e) {
