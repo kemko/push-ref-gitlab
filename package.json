@@ -1,6 +1,6 @@
 {
   "name": "push-ref-gitlab",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "A command line tool used for pushing a Git ref to Gitlab and setting up Continuous Integration in the process.",
   "main": "index.js",
   "engines": {
@@ -26,6 +26,7 @@
   },
   "homepage": "http://gpii.net",
   "dependencies": {
-    "minimist": "1.2.0"
+    "minimist": "1.2.0",
+    "del": "2.2.2"
   }
 }
